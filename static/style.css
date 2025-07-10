@@ -1,0 +1,47 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.date {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.container{
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+}
+
+.time{
+    font-size: 25px;
+    font-weight: bold;
+}
+
+.game{
+    display: flex;
+    padding: 20px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+.teams{
+    display: flex;
+    gap: 50px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+}
+
+.team{
+    display: flex;
+    flex-direction: column;
+}
+
+img{
+    width: 100px;
+}
