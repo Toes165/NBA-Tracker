@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Live NBA Scoreboard</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin: 0;
+      padding: 0 10px 20px;
+      background: #f5f5f5;
+      color: #222;
+    }
+
+    h1.title {
+      margin-top: 20px;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #003366;
+      text-align: left;
+      padding-left: 10px;
+      font-style: italic;
+      letter-spacing: 0.03em;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: flex-start;
+      margin: 20px 0 0 10px;
+      gap: 30px;
+      border-bottom: 2px solid transparent;
+    }
+
+    .tab {
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1.1rem;
+      user-select: none;
+      padding-bottom: 6px;
+      color: #555;
+      border-bottom: 3px solid transparent;
+      transition: border-color 0.3s, color 0.3s;
+    }
+
+    .tab:hover {
+      color: #0077cc;
+    }
+
+    .tab.active {
+      color: #0077cc;
+      border-bottom-color: #0077cc;
+      font-weight: 700;
+    }
+
+    #games, #standings {
+      max-width: 700px;
+      margin: auto;
+      text-align: left;
+    }
+
+    #games h2, #games h3 {
+      margin-left: 10px;
+      color: #003366;
+      font-weight: 700;
+    }
+
+    #current-game-section {
+      margin-bottom: 30px;
+    }
+    #recent-games-section {
+      margin-bottom: 30px;
+    }
+
+    #current-game-container > p,
+    #recent-games-container > p {
+      margin-top: 24px;
+      font-style: italic;
+      color: #666;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    .game {
+      background-color: white;
+      border-radius: 10px;
+      padding: 15px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 8px rgb(0 0 0 / 0.1);
+    }
+
+    .teams {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .team-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      max-width: 45%;
+    }
+
+    .team-logo {
+      width: 48px;
+      height: 48px;
+      object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 0 3px rgba(0,0,0,0.2);
+      background: white;
+    }
+
+    .team-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #111;
+    }
+
+    .score {
+      font-size: 2rem;
+      font-weight: 700;
+      text-align: center;
+      color: #0077cc;
+      margin-bottom: 6px;
+    }
+
+    .status {
+      font-style: italic;
+      color: #555;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+
+    .time {
+      font-size: 0.9rem;
+      color: #666;
+      text-align: right;
+    }
+
+    #standings {
+      display: none;
+      background: white;
+      border-radius: 10px;
+      padding: 15px 25px;
+      box-shadow: 0 4px 10px rgb(0 0 0 / 0.1);
+    }
+
+    #standings-header {
+      display: flex;
+      align-items: center;
+      margin-left: 10px;
+      margin-bottom: 10px;
+      color: #003366;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+    #standings-header .wl-header {
+      margin-left: auto;
+      width: 80px;
+      text-align: right;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #0077cc;
+    }
+
+    .standing-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid #ddd;
+      font-size: 1rem;
+    }
+
+    .standing-row:last-child {
+      border-bottom: none;
+    }
+
+    .standing-place {
+      width: 20px;
+      font-weight: 700;
+      color: #666;
+      text-align: right;
+      user-select: none;
+    }
+
+    .standing-logo {
+      width: 36px;
+      height: 36px;
+      object-fit: contain;
+      border-radius: 5px;
+      background: white;
+      box-shadow: 0 0 3px rgba(0,0,0,0.2);
+    }
+
+    .standing-team {
+      flex: 1;
+      font-weight: 600;
+      color: #222;
+    }
+
+    .standing-wl {
+      width: 80px;
+      text-align: right;
+      font-weight: 700;
+      color: #0077cc;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">NBA live scores and stat tracking</h1>
+
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('games')">Games</div>
+      <div class="tab" onclick="showTab('standings')">Standings</div>
+    </div>
+
+    <div id="games">
+      <div id="current-game-section">
+        <h2>Current/Upcoming game</h2>
+        <div id="current-game-container"></div>
+      </div>
+      <div id="recent-games-section">
+        <h2>Recent Series/Games</h2>
+        <div id="recent-games-container"></div>
+      </div>
+    </div>
+
+    <div id="standings"></div>
+  </div>
+
+  <script>
+    // Maps team names (used in data) to logo URLs
+    const teamLogos = {
+      "Warriors": "https://a.espncdn.com/i/teamlogos/nba/500/gsw.png",
+      "Lakers": "https://a.espncdn.com/i/teamlogos/nba/500/lal.png",
+      "Celtics": "https://a.espncdn.com/i/teamlogos/nba/500/bos.png",
+      "Heat": "https://a.espncdn.com/i/teamlogos/nba/500/mia.png",
+      "Nuggets": "https://a.espncdn.com/i/teamlogos/nba/500/den.png",
+      "Knicks": "https://a.espncdn.com/i/teamlogos/nba/500/nyk.png",
+      "Thunder": "https://a.espncdn.com/i/teamlogos/nba/500/okc.png",
+      "Pacers": "https://a.espncdn.com/i/teamlogos/nba/500/ind.png",
+      "Timberwolves": "https://a.espncdn.com/i/teamlogos/nba/500/min.png",
+      "Bulls": "https://a.espncdn.com/i/teamlogos/nba/500/chi.png",
+      "Clippers": "https://a.espncdn.com/i/teamlogos/nba/500/lac.png",
+      "Rockets": "https://a.espncdn.com/i/teamlogos/nba/500/hou.png",
+      "Suns": "https://a.espncdn.com/i/teamlogos/nba/500/phx.png",
+      "76ers": "https://a.espncdn.com/i/teamlogos/nba/500/phi.png",
+      "Bucks": "https://a.espncdn.com/i/teamlogos/nba/500/mil.png",
+      "Jazz": "https://a.espncdn.com/i/teamlogos/nba/500/utah.png",
+      "Pelicans": "https://a.espncdn.com/i/teamlogos/nba/500/no.png",
+      "Raptors": "https://a.espncdn.com/i/teamlogos/nba/500/tor.png",
+      "Grizzlies": "https://a.espncdn.com/i/teamlogos/nba/500/mem.png",
+      "Hornets": "https://a.espncdn.com/i/teamlogos/nba/500/cha.png",
+      "Magic": "https://a.espncdn.com/i/teamlogos/nba/500/orl.png",
+      "Wizards": "https://a.espncdn.com/i/teamlogos/nba/500/wsh.png",
+      "Cavaliers": "https://a.espncdn.com/i/teamlogos/nba/500/cle.png",
+      "Kings": "https://a.espncdn.com/i/teamlogos/nba/500/sac.png",
+      "Trail Blazers": "https://a.espncdn.com/i/teamlogos/nba/500/por.png",
+      "Nets": "https://a.espncdn.com/i/teamlogos/nba/500/bkn.png",
+      "Pistons": "https://a.espncdn.com/i/teamlogos/nba/500/det.png",
+      "Hawks": "https://a.espncdn.com/i/teamlogos/nba/500/atl.png",
+      "Mavericks": "https://a.espncdn.com/i/teamlogos/nba/500/dal.png",
+      "Spurs": "https://a.espncdn.com/i/teamlogos/nba/500/sas.png"
+    };
+
+    // Tab switcher: toggles visibility of games or standings section
+    function showTab(tabId) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('#games, #standings').forEach(d => d.style.display = 'none');
+
+      document.querySelector(`.tab[onclick="showTab('${tabId}')"]`).classList.add('active');
+      document.getElementById(tabId).style.display = 'block';
+    }
+
+    // Builds and returns a game's HTML representation from provided game data
+    function renderGame(game) {
+      const dateObj = new Date(game.date);
+      const homeLogo = teamLogos[game.home_team] || 'https://via.placeholder.com/48?text=No+Logo';
+      const visitorLogo = teamLogos[game.visitor_team] || 'https://via.placeholder.com/48?text=No+Logo';
+
+      return `
+        <div class="game">
+          <div class="teams">
+            <div class="team-row">
+              <img class="team-logo" src="${homeLogo}" alt="${game.home_team} logo" />
+              <span class="team-name">${game.home_team}</span>
+            </div>
+            <div class="team-row" style="flex-direction: row-reverse;">
+              <img class="team-logo" src="${visitorLogo}" alt="${game.visitor_team} logo" />
+              <span class="team-name">${game.visitor_team}</span>
+            </div>
+          </div>
+          <div class="score">${game.home_score} - ${game.visitor_score}</div>
+          <div class="status">${game.game_status}</div>
+          <div class="time">${dateObj.toLocaleDateString()}</div>
+        </div>`;
+    }
+
+    // Fetch and display current/upcoming and recent games
+    function fetchGames() {
+      fetch('/scoreboard')
+        .then(res => res.json())
+        .then(data => {
+          const currentContainer = document.getElementById('current-game-container');
+          const recentContainer = document.getElementById('recent-games-container');
+          currentContainer.innerHTML = '';
+          recentContainer.innerHTML = '';
+
+          // Only show today's games, display message if none
+          if (data.upcoming && data.upcoming.length > 0) {
+            currentContainer.innerHTML = renderGame(data.upcoming[0]);
+          } else {
+            currentContainer.innerHTML = '<p>No scheduled games today.</p>';
+          }
+
+          // Render recent series or display error message
+          if (data.recent && data.recent.length > 0) {
+            let recentHtml = '';
+            data.recent.forEach(game => {
+              recentHtml += renderGame(game);
+            });
+            recentContainer.innerHTML = recentHtml;
+          } else {
+            recentContainer.innerHTML = '<p>No recent games available.</p>';
+          }
+        })
+        .catch(err => {
+          // Catch fetch failures and notify user
+          document.getElementById('current-game-container').innerHTML = '<p>Error loading games.</p>';
+          document.getElementById('recent-games-container').innerHTML = '<p>Error loading recent games.</p>';
+          console.error(err);
+        });
+    }
+
+    // Fetch and display current NBA standings
+    function fetchStandings() {
+      fetch('/standings')
+        .then(res => res.json())
+        .then(data => {
+          const standings = data.standings || [];
+
+          // Season label + dynamic team list
+          let output = `
+            <div id="standings-header">
+              NBA Standings (2024-2025)
+              <div class="wl-header">W-L</div>
+            </div>`;
+
+          standings.forEach((team, index) => {
+            const logo = teamLogos[team.team] || 'https://via.placeholder.com/36?text=No+Logo';
+            const place = index + 1;
+            output += `
+              <div class="standing-row">
+                <div class="standing-place">${place}</div>
+                <img class="standing-logo" src="${logo}" alt="${team.team} logo" />
+                <div class="standing-team">${team.team}</div>
+                <div class="standing-wl">${team.wins} - ${team.losses}</div>
+              </div>`;
+          });
+
+          document.getElementById('standings').innerHTML = output;
+        })
+        .catch(err => {
+          // Catch fetch failures and notify user
+          document.getElementById('standings').innerHTML = '<p>Error loading standings.</p>';
+          console.error(err);
+        });
+    }
+
+    // Initial load
+    fetchGames();
+    fetchStandings();
+    setInterval(fetchGames, 30000);  // Refresh games every 30s
+
+    // Default to games tab
+    showTab('games');
+  </script>
+</body>
+</html>
