@@ -43,7 +43,7 @@ This project is a web-based application that displays live NBA game scores, rece
 
 1. **Clone the repository** (or download the files manually):
    ```bash
-   git clone https://github.com/h-parr/SportWebsite
+   git clone https://github.com/Toes165/NBA-Tracker
    cd NBA-Scoreboard
    ```
 
@@ -109,5 +109,6 @@ Both endpoints use `nba_api`:
 - Improve mobile responsiveness and accessibility
 
 ---
+
 
 
