@@ -55,7 +55,7 @@ This project is a web-based application that displays live NBA game scores, rece
 
 3. **Install dependencies**:
    ```bash
-   pip install -r 
+   pip install 
    flask
    nba_api
    gunicorn
@@ -109,6 +109,7 @@ Both endpoints use `nba_api`:
 - Improve mobile responsiveness and accessibility
 
 ---
+
 
 
 
