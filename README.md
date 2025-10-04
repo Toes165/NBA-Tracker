@@ -64,7 +64,7 @@ This project is a web-based application that displays live NBA game scores, rece
 
 4. **Run the Flask app**:
    ```bash
-   python app.py
+   python nbaAPI.py
    ```
 
 5. **Open your browser** and go to:
@@ -109,6 +109,7 @@ Both endpoints use `nba_api`:
 - Improve mobile responsiveness and accessibility
 
 ---
+
 
 
 
